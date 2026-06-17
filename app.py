@@ -53,24 +53,43 @@ if uploaded_file:
     tab1, tab2, tab3, tab4 = st.tabs(["📊 Tổng quan", "🔗 Tương quan môn học", "⚠️ Cảnh báo hỗ trợ", "📝 Xuất dữ liệu"])
 
     with tab1:
-        st.subheader("Phân bố học lực")
-        if not df.empty:
-            col1, col2 = st.columns([1, 2])
-            xep_loai_count = df['Xep_Loai'].value_counts()
-            
-            # --- ĐOẠN ĐÃ SỬA: Dùng Plotly thay vì st.pie_chart ---
-            fig_pie = px.pie(
-                values=xep_loai_count.values, 
-                names=xep_loai_count.index, 
-                title="Tỷ lệ học lực"
-            )
-            col1.plotly_chart(fig_pie, use_container_width=True)
-            # ----------------------------------------------------
-            
-            fig_box = px.box(df, x="Lớp", y="Tong_Diem", color="Lớp", title="Biến động điểm số giữa các lớp")
-            col2.plotly_chart(fig_box, use_container_width=True)
-        else:
-            st.warning("Không có dữ liệu thỏa mãn bộ lọc hiện tại.")
+        st.subheader("📊 Báo cáo chỉ số chi tiết")
+        
+        # 1. Các chỉ số cơ bản (Metrics)
+        col1, col2, col3, col4 = st.columns(4)
+        col1.metric("Tổng HS dự thi", len(df))
+        col2.metric("TB Toán", round(df['Toán'].mean(), 2))
+        col3.metric("TB Văn", round(df['Ngữ văn'].mean(), 2))
+        col4.metric("TB Anh", round(df['Tiếng Anh'].mean(), 2))
+        
+        st.markdown("---")
+        
+        # 2. Bảng Min/Max
+        st.subheader("Giá trị Cao nhất & Thấp nhất")
+        summary_stats = pd.DataFrame({
+            "Môn học": ["Toán", "Ngữ văn", "Tiếng Anh"],
+            "Điểm cao nhất": [df['Toán'].max(), df['Ngữ văn'].max(), df['Tiếng Anh'].max()],
+            "Điểm thấp nhất": [df['Toán'].min(), df['Ngữ văn'].min(), df['Tiếng Anh'].min()]
+        })
+        st.table(summary_stats)
+        
+        # 3. Bảng phân bổ điểm số (Binning)
+        st.subheader("Phân bổ điểm số theo thang điểm")
+        bins = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        labels = ['<1', '1-2', '2-3', '3-4', '4-5', '5-6', '6-7', '7-8', '8-9', '9-10']
+        
+        # Tạo bảng thống kê cho từng môn
+        dist_data = {}
+        for col in ['Toán', 'Ngữ văn', 'Tiếng Anh']:
+            dist_data[col] = pd.cut(df[col], bins=bins, labels=labels, include_lowest=True).value_counts().sort_index()
+        
+        dist_df = pd.DataFrame(dist_data)
+        st.table(dist_df)
+        
+        # 4. Biểu đồ đi kèm
+        st.markdown("---")
+        fig_box = px.box(df, x="Lớp", y="Tong_Diem", color="Lớp", title="Biến động tổng điểm giữa các lớp")
+        st.plotly_chart(fig_box, use_container_width=True)
 
     with tab2:
         st.subheader("Tương quan giữa các môn học")
