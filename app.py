@@ -64,7 +64,7 @@ if uploaded_file:
         # 2. Bảng nhiệt (Heatmap)
         st.subheader("Bảng phân bổ điểm số (Heatmap)")
         bins = [0, 5, 6, 7, 8, 9, 10.01]
-        labels = ['<5', '5-6', '6-7', '7-8', '8-9', '9-10']
+        labels = ['<5', '5-6', '6-7', '7-8', '8-9', '9-10','10']
         freq_table = pd.DataFrame(index=labels)
         for col in ['Toán', 'Ngữ văn', 'Tiếng Anh']:
             freq_table[col] = pd.cut(df[col], bins=bins, labels=labels, right=False).value_counts().sort_index()
