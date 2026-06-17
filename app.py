@@ -58,8 +58,14 @@ if uploaded_file:
             col1, col2 = st.columns([1, 2])
             xep_loai_count = df['Xep_Loai'].value_counts()
             
-            # Vẽ biểu đồ tròn an toàn
-            col1.pie_chart(xep_loai_count)
+            # --- ĐOẠN ĐÃ SỬA: Dùng Plotly thay vì st.pie_chart ---
+            fig_pie = px.pie(
+                values=xep_loai_count.values, 
+                names=xep_loai_count.index, 
+                title="Tỷ lệ học lực"
+            )
+            col1.plotly_chart(fig_pie, use_container_width=True)
+            # ----------------------------------------------------
             
             fig_box = px.box(df, x="Lớp", y="Tong_Diem", color="Lớp", title="Biến động điểm số giữa các lớp")
             col2.plotly_chart(fig_box, use_container_width=True)
