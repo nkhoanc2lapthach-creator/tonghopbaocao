@@ -50,45 +50,43 @@ if uploaded_file:
     with tab1:
         st.header("📊 BÁO CÁO TỔNG QUAN HỌC TẬP")
         
-        # 1. Chỉ số chung
-        st.subheader("1. Chỉ số chung")
-        summary_data = {
-            "Chỉ số": ["Tổng số học sinh", "Điểm TB Toán", "Điểm TB Văn", "Điểm TB Anh"],
-            "Giá trị": [len(df), round(df['Toán'].mean(), 2), round(df['Ngữ văn'].mean(), 2), round(df['Tiếng Anh'].mean(), 2)]
-        }
-        st.dataframe(pd.DataFrame(summary_data).set_index("Chỉ số"), use_container_width=True)
+        # Tạo khung bao quanh cho các chỉ số chung
+        with st.container(border=True):
+            col1, col2, col3, col4 = st.columns(4)
+            col1.metric("Tổng HS", len(df))
+            col2.metric("TB Toán", f"{df['Toán'].mean():.2f}")
+            col3.metric("TB Văn", f"{df['Ngữ văn'].mean():.2f}")
+            col4.metric("TB Anh", f"{df['Tiếng Anh'].mean():.2f}")
 
-        # 2. Min/Max
+        # Bảng Min/Max với Styler (Tô màu nhấn mạnh)
         st.subheader("2. Thống kê cao nhất - thấp nhất")
-        min_max_data = {
+        min_max_df = pd.DataFrame({
             "Môn học": ["Toán", "Ngữ văn", "Tiếng Anh"],
             "Cao nhất": [df['Toán'].max(), df['Ngữ văn'].max(), df['Tiếng Anh'].max()],
             "Thấp nhất": [df['Toán'].min(), df['Ngữ văn'].min(), df['Tiếng Anh'].min()]
-        }
-        st.dataframe(pd.DataFrame(min_max_data).set_index("Môn học"), use_container_width=True)
+        }).set_index("Môn học")
+        
+        # Định dạng bảng đẹp
+        st.dataframe(min_max_df.style.format("{:.2f}").background_gradient(cmap='Greens', subset=['Cao nhất']), use_container_width=True)
 
-        # 3. Phân bổ điểm chi tiết các môn
-        st.subheader("3. Phân bổ điểm số theo thang điểm (Số lượng HS)")
+        # Bảng phân bổ điểm số (Heatmap)
+        st.subheader("3. Phân bổ điểm số chi tiết")
         bins = [0, 5, 6, 7, 8, 9, 10.01]
         labels = ['<5', '5-6', '6-7', '7-8', '8-9', '9-10']
         freq_table = pd.DataFrame(index=labels)
         for col in ['Toán', 'Ngữ văn', 'Tiếng Anh']:
             freq_table[col] = pd.cut(df[col], bins=bins, labels=labels, right=False).value_counts().sort_index()
-        st.dataframe(freq_table.style.highlight_max(axis=0, color='#d4edda'), use_container_width=True)
+        
+        # Sử dụng Styler để tô màu bảng heatmap
+        st.dataframe(freq_table.style.background_gradient(cmap='Blues'), use_container_width=True)
 
-        # 4. Phân bổ tổng điểm
-        st.subheader("4. Phân bổ Tổng điểm")
-        bins_total = [0, 15, 18, 24, 30]
-        labels_total = ['Dưới 15', '15-18', '18-24', 'Trên 24']
-        total_dist = pd.cut(df['Tong_Diem'], bins=bins_total, labels=labels_total).value_counts().reset_index()
-        total_dist.columns = ['Mức điểm', 'Số lượng HS']
-        st.dataframe(total_dist, use_container_width=True)
-
-        # 5. Tỷ lệ học lực
+        # 5. Tỷ lệ học lực (Biểu đồ tròn đẹp)
         st.subheader("5. Tỷ lệ học lực")
         rank_counts = df['Xep_Loai'].value_counts()
-        fig_pie = px.pie(values=rank_counts.values, names=rank_counts.index, hole=0.4, 
+        fig_pie = px.pie(values=rank_counts.values, names=rank_counts.index, hole=0.5,
+                         color=rank_counts.index,
                          color_discrete_map={'Giỏi':'#28a745', 'Khá':'#ffc107', 'Trung bình':'#17a2b8', 'Yếu/Kém':'#dc3545'})
+        fig_pie.update_traces(textinfo='percent+label', textposition='outside')
         st.plotly_chart(fig_pie, use_container_width=True)
 
     with tab2:
