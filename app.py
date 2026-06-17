@@ -57,9 +57,9 @@ if uploaded_file:
         with st.container(border=True):
             col1, col2, col3, col4 = st.columns(4)
             col1.metric("Tổng HS", len(df))
-            col2.metric("TB Toán", f"{df['Toán'].mean():.2f}")
-            col3.metric("TB Văn", f"{df['Ngữ văn'].mean():.2f}")
-            col4.metric("TB Anh", f"{df['Tiếng Anh'].mean():.2f}")
+            col2.metric("TB Toán", f"{df['Toán'].mean():.2f}", delta="0.5")
+            col3.metric("TB Văn", f"{df['Ngữ văn'].mean():.2f}", delta="1")
+            col4.metric("TB Anh", f"{df['Tiếng Anh'].mean():.2f}", delta="2")
 
         # 2. Bảng nhiệt (Heatmap)
         st.subheader("Bảng phân bổ điểm số (Heatmap)")
