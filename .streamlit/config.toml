@@ -1,0 +1,15 @@
+[theme]
+# Màu chủ đạo (Nút bấm, điểm nhấn, thanh loading)
+primaryColor = "#0047AB"
+
+# Màu nền của cả trang web (Xám cực nhạt để tránh mỏi mắt)
+backgroundColor = "#F8F9FA"
+
+# Màu nền cho các khung (Containers/Sidebar)
+secondaryBackgroundColor = "#FFFFFF"
+
+# Màu chữ chính (Xám đen, không dùng đen tuyền để tạo cảm giác sang hơn)
+textColor = "#2D3436"
+
+# Font chữ (Sans Serif là lựa chọn an toàn và chuyên nghiệp nhất)
+font = "sans serif"
